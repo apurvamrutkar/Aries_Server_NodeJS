@@ -1,0 +1,22 @@
+{
+  "name": "Aries",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "body-parser": "~1.13.2",
+    "client-sessions": "latest",
+    "connect": "latest",
+    "connect-flash": "latest",
+    "dateformat": "latest",
+    "express": "^4.13.4",
+    "express-mailer": "^0.3.0",
+    "express-session": "latest",
+    "mongoose": "latest",
+    "mongoose-auto-increment": "^5.0.1",
+    "multer": "latest",
+    "nodemon": "latest",
+    "numeral": "latest",
+    "sync-request": "^4.0.1",
+    "synchronize": "^2.0.0"
+  }
+}
