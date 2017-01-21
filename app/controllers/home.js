@@ -26,9 +26,10 @@ exports.login = function(req, res) {
 				};
 				var users = [];
 				users.push(newUser);*/
+				console.log(req.body);
 				var newFamily = new Family({
-					familyName: req.body.familyName,
-					users: users
+					familyName: req.body.familyName
+					//users: users
 				});
 				newFamily.save(function(err){
 					if (err) {console.log(err);res.status(500).json({'err':err});}
@@ -39,7 +40,7 @@ exports.login = function(req, res) {
 				});
 				
 			}else{
-				var users = data.users.filter(function(u){
+				/*var users = data.users.filter(function(u){
 					return (u.socialLoginId==req.body.socialLoginId && u.socialLoginType==req.body.socialLoginType);
 				});
 				if(users.length==0){
@@ -49,7 +50,7 @@ exports.login = function(req, res) {
 						socialLoginType: req.body.loginType
 					};
 					data.users.push(newUser);
-				}
+				}*/
 				res.status(200).json(data);
 			}
 		});
@@ -66,7 +67,8 @@ exports.login = function(req, res) {
 }
 */
 exports.addToFridge = function(req, res){
-	if(req.body.itemList==null){
+	console.log(req.body);
+	if(req.body.itemList==null || req.body.itemList.length==0){
 		res.send(403).json({error:'Barcodes incorrect'});
 	}else{
 		Family.findById(req.params.id, function(err, Family){
@@ -209,7 +211,7 @@ exports.addToFridge = function(req, res){
 					}
 					
 					for(var k=0;k<garbageItemsTobeRemoved.length;k++){
-						Family.garbageList = Family.garbageList.splice(garbageItemsTobeRemoved[k],1);
+						Family.garbageList.splice(garbageItemsTobeRemoved[k],1);
 					}
 					Family.save(function(err){
 						if(err) { console.log(err); res.status(204).json({error:'Some error at the server'})}
@@ -237,27 +239,34 @@ exports.addToGarbage = function(req, res){
 	if(req.body.itemList==null){
 		res.send(403).json({error:'Barcodes incorrect'});
 	}else{
-		Family.findById(req.params.id, function(err, family){
+		Family.findById(req.params.id, function(err, Family){
 			if (err) {console.log(err);res.status(500).json({error:'Family not found'});}
-			if(family!=null){
+			if(Family!=null){
 				var currentDate = new Date();
 				var fridgeItemsToBeRemoved=[];
 				var items = req.body.itemList;
+
 				for(var i=0;i<items.length;i++){
 
 					var product=null;
-					console.log("here finding product");
 					for(var j=0;j<Family.productList.length;j++){
 						if(Family.productList[j].barcode == items[i].barcode){
-							var product = Family.productList[j];
+							product = Family.productList[j];
 						}
+					}
+					if(product==null){
+						console.log("Invalid product while adding to garbage");
+						res.send(500).json({error:'Invalid product'});
 					}
 					//to find the items to be updated in the fridgeList
 					//if the quantity becomes 0 then remove from the fridgelist
+					var isPresentInFridge = false;
 					for(var gi=0;gi<Family.fridgeList.length;gi++){
+						console.log(Family.fridgeList[gi].product.barcode+"      "+items[i].barcode);
 						if(Family.fridgeList[gi].product.barcode==items[i].barcode){
+							isPresentInFridge=true;
 							Family.fridgeList[gi].quantity=Family.fridgeList[gi].quantity-1;
-							if(Family.fridgeList[gi].quantity){
+							if(Family.fridgeList[gi].quantity==0){
 								fridgeItemsToBeRemoved.push(gi);
 							}
 							break;
@@ -269,7 +278,10 @@ exports.addToGarbage = function(req, res){
 							break;
 						}*/
 					}
-
+					if(!isPresentInFridge){
+						console.log('Item removed was not added to fridge');
+						res.send(500).json({error:'Item removed was not added to fridge'});
+					}
 					var isAGarbageItem = false;
 					for(var fi=0;fi<Family.garbageList.length;fi++){
 						
@@ -299,8 +311,10 @@ exports.addToGarbage = function(req, res){
 				}
 				
 				for(var k=0;k<fridgeItemsToBeRemoved.length;k++){
-					Family.fridgeList = Family.fridgeList.splice(fridgeItemsToBeRemoved[k],1);
+					console.log(k+"   "+fridgeItemsToBeRemoved[k]);
+					Family.fridgeList.splice(fridgeItemsToBeRemoved[k],1);
 				}
+				console.log(Family.fridgeList);
 				Family.save(function(err){
 					if(err) { console.log(err); res.status(204).json({error:'Some error at the server'})}
 					res.status(200).json(Family);
@@ -314,7 +328,6 @@ exports.getAllData = function(req,res){
 	if(req.params.id==null){
 		res.send(403).json({err:'Barcodes incorrect'});
 	}else{
-		console.log("here")
 		Family.findById(req.params.id, function(err, family){
 			if (err) {console.log(err);res.status(500).json({error:'Family not found'});}
 			if(family!=null){
