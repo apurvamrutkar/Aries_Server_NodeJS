@@ -87,7 +87,7 @@ exports.addToFridge = function(req, res){
 						}
 						console.log("items:"+JSON.stringify(items[i]));
 						for(var j=0;j<Family.productList.length;j++){
-							if(Family.productList[j].barcode == items[i].barcode || Family.productList[j].name==items[i].name){
+							if(Family.productList[j].barcode == items[i].barcode){
 								product = Family.productList[j];
 								if(product.name==''){
 									//this is if the user himself enters the name and description for the product 
