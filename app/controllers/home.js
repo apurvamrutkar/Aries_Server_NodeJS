@@ -196,16 +196,16 @@ exports.addToFridge = function(req, res){
 						var isAFridgeItem = false;
 						for(var fi=0;fi<Family.fridgeList.length;fi++){
 							if(Family.fridgeList[fi].product.barcode==items[i].barcode){
-								//var productQuantity = 1;
+								var productQuantity = 1;
 								if(items[i].quantity!=null){
 									product.name = items[i].name;
 									product.description = items[i].name;
-									//productQuantity = items[i].quantity-Family.fridgeList[fi].product.quantity;
+									productQuantity = 0;
 									Family.fridgeList[fi].product.name = items[i].name;
 									Family.fridgeList[fi].product.description = items[i].description;
 								}
 
-								Family.fridgeList[fi].quantity=Family.fridgeList[fi].quantity+1;
+								Family.fridgeList[fi].quantity=Family.fridgeList[fi].quantity+productQuantity;
 								isAFridgeItem = true;
 								break;
 							}/*else if(Family.fridgeList[fi].product.name==items[i].name){
