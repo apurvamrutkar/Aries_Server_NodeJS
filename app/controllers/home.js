@@ -379,10 +379,10 @@ exports.amazonCall = function(req,res){
 	}else{
 		Family.findById(req.params.id, function(err, Family){
 			if (err) {console.log(err);res.status(500).json({error:'Family not found'});}
-
+			var upcCodes = req.body.upcCodes;
 			if(Family!=null && upcCodes!=null && upcCodes.length>0){
 				var asin = "";
-				var upcCodes = req.body.upcCodes;
+				
 				for(var i=0;i<upcCodes.length;i++){
 					console.log("upc:"+upcCodes[i].code);
 					var z = request('GET','http://upctoasin.com/'+upcCodes[i].code);
