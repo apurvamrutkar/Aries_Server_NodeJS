@@ -85,7 +85,7 @@ exports.addToFridge = function(req, res){
 						if(items[i].quantity!=null){
 							items[i].quantity = parseInt(items[i].quantity);
 						}
-						console.log("items:"+JSON.Stringify(items[i]));
+						console.log("items:"+JSON.stringify(items[i]));
 						for(var j=0;j<Family.productList.length;j++){
 							if(Family.productList[j].barcode == items[i].barcode || Family.productList[j].name==items[i].name){
 								product = Family.productList[j];
