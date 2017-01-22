@@ -384,7 +384,9 @@ exports.amazonCall = function(req,res){
 				var asin = "";
 				var upcCodes = req.body.upcCodes;
 				for(var i=0;i<upcCodes.length;i++){
+					console.log("upc:"+upcCodes[i].code);
 					var z = request('GET','http://upctoasin.com/'+upcCodes[i].code);
+					console.log("output:"+z.getBody('utf8'));
 					if(z!=null && z!=''){
 						asin = asin+"ASIN."+(i+1)+"="+z.getBody('utf8')+"&"+"Quantity."+(i+1)+"="+upcCodes[i].quantity+"&";
 					}
