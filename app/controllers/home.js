@@ -67,9 +67,8 @@ exports.login = function(req, res) {
 }
 */
 exports.addToFridge = function(req, res){
-	console.log(req.body);
 	if(req.body.itemList==null || req.body.itemList.length==0){
-		res.send(403).json({error:'Barcodes incorrect'});
+		res.status(403).json({error:'Barcodes incorrect'});
 	}else{
 		Family.findById(req.params.id, function(err, Family){
 			if (err) {console.log(err);res.status(500).json({error:'Family not found'});}
@@ -81,9 +80,11 @@ exports.addToFridge = function(req, res){
 					var garbageItemsTobeRemoved=[];
 					for(var i=0;i<items.length;i++){
 						var product=null;
-						console.log("here finding product");
+						if(items[i].quantity!=null && typeof items[i].quantity!='number'){
+							items[i].quantity = parseInt(items[i].quantity);
+						}
 						for(var j=0;j<Family.productList.length;j++){
-							if(Family.productList[j].barcode == items[i].barcode){
+							if(Family.productList[j].barcode == items[i].barcode || Family.productList[j].name==items[i].name){
 								product = Family.productList[j];
 								if(product.name==''){
 									//this is if the user himself enters the name and description for the product 
@@ -155,7 +156,7 @@ exports.addToFridge = function(req, res){
 									created_date:currentDate,							
 									updated_date:currentDate,
 									name:items[i].name,
-									description:items[i].description,
+									description:items[i].name,
 									barcode:barcodeCount+1,
 									totalConsumed:1
 								}
@@ -166,12 +167,15 @@ exports.addToFridge = function(req, res){
 							
 						}
 
+
+						
+
 						for(var gi=0;gi<Family.garbageList.length;gi++){
 							//console.log("product:"+JSON.stringify(Family.fridgeList[fi]));
 							//console.log("fi fridgelIst:"+Family.fridgeList);
 							if(Family.garbageList[gi].product.barcode==items[i].barcode){
 								Family.garbageList[gi].quantity=Family.garbageList[gi].quantity-1;
-								if(Family.garbageList[gi].quantity){
+								if(Family.garbageList[gi].quantity<0){
 									garbageItemsTobeRemoved.push(gi);
 								}
 								break;
@@ -184,11 +188,21 @@ exports.addToFridge = function(req, res){
 							}*/
 						}
 
+						
 
 						var isAFridgeItem = false;
 						for(var fi=0;fi<Family.fridgeList.length;fi++){
 							if(Family.fridgeList[fi].product.barcode==items[i].barcode){
-								Family.fridgeList[fi].quantity=Family.fridgeList[fi].quantity+1;
+								var productQuantity = 1;
+								if(items[i].quantity!=null){
+									product.name = items[i].name;
+									product.description = items[i].name;
+									productQuantity = items[i].quantity-Family.fridgeList[fi].product.quantity;
+									Family.fridgeList[fi].product.name = items[i].name;
+									Family.fridgeList[fi].product.description = items[i].description;
+								}
+
+								Family.fridgeList[fi].quantity=Family.fridgeList[fi].quantity+productQuantity;
 								isAFridgeItem = true;
 								break;
 							}/*else if(Family.fridgeList[fi].product.name==items[i].name){
@@ -236,8 +250,9 @@ exports.addToFridge = function(req, res){
 }
 */
 exports.addToGarbage = function(req, res){
-	if(req.body.itemList==null){
-		res.send(403).json({error:'Barcodes incorrect'});
+	console.log(req.body.itemList);
+	if(req.body.itemList==null || req.body.itemList.length==0){
+		res.status(403).json({error:'Barcodes incorrect'});
 	}else{
 		Family.findById(req.params.id, function(err, Family){
 			if (err) {console.log(err);res.status(500).json({error:'Family not found'});}
@@ -247,7 +262,9 @@ exports.addToGarbage = function(req, res){
 				var items = req.body.itemList;
 
 				for(var i=0;i<items.length;i++){
-
+					if(items[i].quantity!=null && typeof items[i].quantity!='number'){
+							items[i].quantity = parseInt(items[i].quantity);
+					}
 					var product=null;
 					for(var j=0;j<Family.productList.length;j++){
 						if(Family.productList[j].barcode == items[i].barcode){
@@ -256,7 +273,7 @@ exports.addToGarbage = function(req, res){
 					}
 					if(product==null){
 						console.log("Invalid product while adding to garbage");
-						res.send(500).json({error:'Invalid product'});
+						res.status(500).json({error:'Invalid product'});
 					}
 					//to find the items to be updated in the fridgeList
 					//if the quantity becomes 0 then remove from the fridgelist
@@ -280,7 +297,7 @@ exports.addToGarbage = function(req, res){
 					}
 					if(!isPresentInFridge){
 						console.log('Item removed was not added to fridge');
-						res.send(500).json({error:'Item removed was not added to fridge'});
+						res.status(500).json({error:'Item removed was not added to fridge'});
 					}
 					var isAGarbageItem = false;
 					for(var fi=0;fi<Family.garbageList.length;fi++){
@@ -311,7 +328,6 @@ exports.addToGarbage = function(req, res){
 				}
 				
 				for(var k=0;k<fridgeItemsToBeRemoved.length;k++){
-					console.log(k+"   "+fridgeItemsToBeRemoved[k]);
 					Family.fridgeList.splice(fridgeItemsToBeRemoved[k],1);
 				}
 				console.log(Family.fridgeList);
@@ -326,7 +342,7 @@ exports.addToGarbage = function(req, res){
 
 exports.getAllData = function(req,res){
 	if(req.params.id==null){
-		res.send(403).json({err:'Barcodes incorrect'});
+		res.status(403).json({error:'Barcodes incorrect'});
 	}else{
 		Family.findById(req.params.id, function(err, family){
 			if (err) {console.log(err);res.status(500).json({error:'Family not found'});}
@@ -336,5 +352,34 @@ exports.getAllData = function(req,res){
 				res.status(201).json({error:"Could not find Family"})
 			}
 		});
+	}
+}
+
+/*
+{
+	upcCodes:[
+		{
+			"code":"11231221123",
+			"quantity":3
+		}
+	]
+}
+*/
+exports.amazonCall = function(req,res){
+	if(req.params.id==null || req.body==null){
+		res.status(403).json({error:'Incorrect data sent'});
+	}else{
+		var asin = "";
+		var upcCodes = req.body.upcCodes;
+		for(var i=0;i<upcCodes.length;i++){
+			var z = request('GET','http://198.199.121.16/'+upcCodes[i].code);
+			if(z!=null && z!=''){
+				asin = asin+"ASIN."+(i+1)+"="+z.getBody('utf8')+"&"+"Quantity."+(i+1)+"="+upcCodes[i].quantity+"&";
+			}
+		}
+		var data = {
+			url:'https://www.amazon.com/gp/aws/cart/add.html?'+asin+'AWSAccessKeyId=AKIAJ34LUZETTZFXGMDQ&AssociateTag=aries0a-20'
+		}
+		res.status(200).json(data);
 	}
 }

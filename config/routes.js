@@ -20,5 +20,5 @@ module.exports = function (app) {
     app.post('/family/:id/addToFridge', home.addToFridge);
     app.post('/family/:id/addToGarbage', home.addToGarbage);
     app.get('/family/:id', home.getAllData);
-
+    app.post('/family/:id/amazonOrder', home.amazonCall);
 }
