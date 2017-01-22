@@ -85,7 +85,6 @@ exports.addToFridge = function(req, res){
 						if(items[i].quantity!=null){
 							items[i].quantity = parseInt(items[i].quantity);
 						}
-						console.log("items:"+JSON.stringify(items[i]));
 						for(var j=0;j<Family.productList.length;j++){
 							if(Family.productList[j].barcode == items[i].barcode){
 								product = Family.productList[j];
@@ -106,7 +105,6 @@ exports.addToFridge = function(req, res){
 								var upcInfo = request('GET','http://api.upcdatabase.org/json/686805871a799c2b1a0e06e77a544fce/'+items[i].barcode);
 								
 								var bodyUPC = JSON.parse(upcInfo.getBody('utf8'));
-								console.log(JSON.stringify(bodyUPC));
 								if(bodyUPC.valid=='true'){
 									var productText = bodyUPC.description;
 									if(productText==""){
@@ -125,7 +123,6 @@ exports.addToFridge = function(req, res){
 									//try once more by adding a 0 to the barcode and hit upc
 									upcInfo = request('GET','http://api.upcdatabase.org/json/686805871a799c2b1a0e06e77a544fce/0'+items[i].barcode);
 									var bodyUPC = JSON.parse(upcInfo.getBody('utf8'));
-									console.log("with 0:"+JSON.stringify(bodyUPC));
 									if(bodyUPC.valid=='true'){
 										var productText = bodyUPC.description;
 										if(productText==""){
@@ -284,7 +281,6 @@ exports.addToGarbage = function(req, res){
 					//if the quantity becomes 0 then remove from the fridgelist
 					var isPresentInFridge = false;
 					for(var gi=0;gi<Family.fridgeList.length;gi++){
-						console.log(Family.fridgeList[gi].product.barcode+"      "+items[i].barcode);
 						if(Family.fridgeList[gi].product.barcode==items[i].barcode){
 							isPresentInFridge=true;
 							Family.fridgeList[gi].quantity=Family.fridgeList[gi].quantity-1;
@@ -336,7 +332,6 @@ exports.addToGarbage = function(req, res){
 				for(var k=0;k<fridgeItemsToBeRemoved.length;k++){
 					Family.fridgeList.splice(fridgeItemsToBeRemoved[k],1);
 				}
-				console.log(Family.fridgeList);
 				Family.save(function(err){
 					if(err) { console.log(err); res.status(204).json({error:'Some error at the server'})}
 					res.status(200).json(Family);
