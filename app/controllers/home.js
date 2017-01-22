@@ -71,7 +71,7 @@ exports.addToFridge = function(req, res){
 		res.status(403).json({error:'Barcodes incorrect'});
 		return;
 	}else{
-		console.log("add to fridge:"+req.body.itemList);
+		console.log("add to fridge:"+JSON.stringify(req.body.itemList));
 		Family.findById(req.params.id, function(err, Family){
 			if (err) {console.log(err);res.status(500).json({error:'Family not found'});}
 			if(Family!=null){
@@ -256,7 +256,7 @@ exports.addToGarbage = function(req, res){
 	if(req.body.itemList==null || req.body.itemList.length==0){
 		res.status(403).json({error:'Barcodes incorrect'});
 	}else{
-		console.log("add to garbage:"+req.body.itemList);
+		console.log("add to garbage:"+JSON.stringify(req.body.itemList));
 		Family.findById(req.params.id, function(err, Family){
 			if (err) {console.log(err);res.status(500).json({error:'Family not found'});}
 			if(Family!=null){
