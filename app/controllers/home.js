@@ -265,7 +265,7 @@ exports.addToGarbage = function(req, res){
 				var items = req.body.itemList;
 
 				for(var i=0;i<items.length;i++){
-					if(items[i].quantity!=null && typeof items[i].quantity==='String'){
+					if(items[i].quantity!=null && isNaN(items[i].quantity)){
 							items[i].quantity = parseInt(items[i].quantity);
 					}
 					var product=null;
