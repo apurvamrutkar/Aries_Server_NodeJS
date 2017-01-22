@@ -376,6 +376,17 @@ exports.amazonCall = function(req,res){
 			if(z!=null && z!=''){
 				asin = asin+"ASIN."+(i+1)+"="+z.getBody('utf8')+"&"+"Quantity."+(i+1)+"="+upcCodes[i].quantity+"&";
 			}
+			for(var fi=0;fi<Family.garbageList.length;fi++){
+						
+				if(Family.garbageList[fi].product.barcode==z.getBody('utf8').code){
+					Family.garbageList.splice(fi,1);
+					break;
+				}/*else if(Family.garbageList[fi].product.name==items[i].name){
+					Family.garbageList[fi].quantity=Family.garbageList[fi].quantity+1;
+					isAGarbageItem = true;
+					break;
+				}*/
+			}
 		}
 		var data = {
 			url:'https://www.amazon.com/gp/aws/cart/add.html?'+asin+'AWSAccessKeyId=AKIAJ34LUZETTZFXGMDQ&AssociateTag=aries0a-20'
