@@ -69,6 +69,7 @@ exports.login = function(req, res) {
 exports.addToFridge = function(req, res){
 	if(req.body.itemList==null || req.body.itemList.length==0){
 		res.status(403).json({error:'Barcodes incorrect'});
+		return;
 	}else{
 		Family.findById(req.params.id, function(err, Family){
 			if (err) {console.log(err);res.status(500).json({error:'Family not found'});}
@@ -274,6 +275,7 @@ exports.addToGarbage = function(req, res){
 					if(product==null){
 						console.log("Invalid product while adding to garbage");
 						res.status(500).json({error:'Invalid product'});
+						return;
 					}
 					//to find the items to be updated in the fridgeList
 					//if the quantity becomes 0 then remove from the fridgelist
@@ -298,6 +300,7 @@ exports.addToGarbage = function(req, res){
 					if(!isPresentInFridge){
 						console.log('Item removed was not added to fridge');
 						res.status(500).json({error:'Item removed was not added to fridge'});
+						return;
 					}
 					var isAGarbageItem = false;
 					for(var fi=0;fi<Family.garbageList.length;fi++){
@@ -348,8 +351,9 @@ exports.getAllData = function(req,res){
 			if (err) {console.log(err);res.status(500).json({error:'Family not found'});}
 			if(family!=null){
 				res.status(200).json(family);
+				return;
 			}else{
-				res.status(201).json({error:"Could not find Family"})
+				res.status(201).json({error:"Could not find Family"});
 			}
 		});
 	}
