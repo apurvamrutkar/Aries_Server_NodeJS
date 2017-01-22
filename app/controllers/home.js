@@ -373,28 +373,33 @@ exports.amazonCall = function(req,res){
 	if(req.params.id==null || req.body==null){
 		res.status(403).json({error:'Incorrect data sent'});
 	}else{
-		var asin = "";
-		var upcCodes = req.body.upcCodes;
-		for(var i=0;i<upcCodes.length;i++){
-			var z = request('GET','http://198.199.121.16/'+upcCodes[i].code);
-			if(z!=null && z!=''){
-				asin = asin+"ASIN."+(i+1)+"="+z.getBody('utf8')+"&"+"Quantity."+(i+1)+"="+upcCodes[i].quantity+"&";
+		Family.findById(req.params.id, function(err, Family){
+			if (err) {console.log(err);res.status(500).json({error:'Family not found'});}
+			if(Family!=null){
+				var asin = "";
+				var upcCodes = req.body.upcCodes;
+				for(var i=0;i<upcCodes.length;i++){
+					var z = request('GET','http://198.199.121.16/'+upcCodes[i].code);
+					if(z!=null && z!=''){
+						asin = asin+"ASIN."+(i+1)+"="+z.getBody('utf8')+"&"+"Quantity."+(i+1)+"="+upcCodes[i].quantity+"&";
+					}
+					for(var fi=0;fi<Family.garbageList.length;fi++){
+								
+						if(Family.garbageList[fi].product.barcode==z.getBody('utf8').code){
+							Family.garbageList.splice(fi,1);
+							break;
+						}/*else if(Family.garbageList[fi].product.name==items[i].name){
+							Family.garbageList[fi].quantity=Family.garbageList[fi].quantity+1;
+							isAGarbageItem = true;
+							break;
+						}*/
+					}
+				}
+				var data = {
+					url:'https://www.amazon.com/gp/aws/cart/add.html?'+asin+'AWSAccessKeyId=AKIAJ34LUZETTZFXGMDQ&AssociateTag=aries0a-20'
+				}
+				res.status(200).json(data);
 			}
-			for(var fi=0;fi<Family.garbageList.length;fi++){
-						
-				if(Family.garbageList[fi].product.barcode==z.getBody('utf8').code){
-					Family.garbageList.splice(fi,1);
-					break;
-				}/*else if(Family.garbageList[fi].product.name==items[i].name){
-					Family.garbageList[fi].quantity=Family.garbageList[fi].quantity+1;
-					isAGarbageItem = true;
-					break;
-				}*/
-			}
-		}
-		var data = {
-			url:'https://www.amazon.com/gp/aws/cart/add.html?'+asin+'AWSAccessKeyId=AKIAJ34LUZETTZFXGMDQ&AssociateTag=aries0a-20'
-		}
-		res.status(200).json(data);
+		});
 	}
 }
