@@ -355,7 +355,7 @@ exports.getAllData = function(req,res){
 				res.status(200).json(family);
 				return;
 			}else{
-				res.status(201).json({error:"Could not find Family"});
+				res.status(404).json({error:"Could not find Family"});
 			}
 		});
 	}
