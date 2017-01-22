@@ -82,7 +82,7 @@ exports.addToFridge = function(req, res){
 					var garbageItemsTobeRemoved=[];
 					for(var i=0;i<items.length;i++){
 						var product=null;
-						if(items[i].quantity!=null && typeof items[i].quantity!='number'){
+						if(items[i].quantity!=null){
 							items[i].quantity = parseInt(items[i].quantity);
 						}
 						for(var j=0;j<Family.productList.length;j++){
