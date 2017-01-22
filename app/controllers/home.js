@@ -373,11 +373,13 @@ exports.getAllData = function(req,res){
 }
 */
 exports.amazonCall = function(req,res){
+	console.log("upcCodes:"+JSON.stringify(req.body));
 	if(req.params.id==null || req.body==null){
 		res.status(403).json({error:'Incorrect data sent'});
 	}else{
 		Family.findById(req.params.id, function(err, Family){
 			if (err) {console.log(err);res.status(500).json({error:'Family not found'});}
+
 			if(Family!=null && upcCodes!=null && upcCodes.length>0){
 				var asin = "";
 				var upcCodes = req.body.upcCodes;
